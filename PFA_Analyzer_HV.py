@@ -424,10 +424,7 @@ for chain_index,evt in enumerate(chain):
 
     processedEvents[RunNumber] = 1 if processedEvents.get(RunNumber) is None else processedEvents.get(RunNumber) + 1
     if not 'MC' in data_ranges.keys():
-        maskedVFATs_masked,VFATMaskBook[RunNumber] = unpackVFATStatus_masked(evt,VFATMaskBook[RunNumber]) # maskedVFATs are basically VFATs rejected.
-        maskedVFATs_missing,_ = unpackVFATStatus_missing(evt,VFATMaskBook[RunNumber]) # maskedVFATs are basically VFATs rejected.
-        maskedVFATs_error,_ = unpackVFATStatus_error(evt,VFATMaskBook[RunNumber]) # maskedVFATs are basically VFATs rejected.
-    ## Break on total number of evts
+        maskedVFATs,VFATMaskBook[RunNumber] = unpackVFATStatus_masked(evt,VFATMaskBook[RunNumber]) 
         if processedEvents[RunNumber] > data_ranges[RunNumber]["nevts"] and data_ranges[RunNumber]["nevts"]> 0:
             logging.debug(f"Exiting after reaching max number of events: {data_ranges[RunNumber]['nevts']}")
             break
@@ -634,33 +631,15 @@ for chain_index,evt in enumerate(chain):
                 if(DAQenabled):
 
                     continue
+            badVFATs =  maskedVFATs.get(chamberID)            
+            #if badVFATs is not None:
+            #    if propVFAT in badVFATs:
+            #        logging.debug(f"On {chamberID} propVFAT {propVFAT} found in MaskedVFATs {badVFATs}. Skipping")
+            #        continue
+            #    elif VFATcompatibleHit(badVFATs,prop_glb_r,prop_loc_x,etaP):
+            #        logging.debug(f"On {chamberID} proVFAT {propVFAT} compatible with MaskedVFATs {badVFATs}. Skipping")
+            #        continue
 
-                """
-                if badVFATs_masked is not None:
-                    if propVFAT in badVFATs_masked:
-                        #logging.debug(f"On {chamberID} propVFAT {propVFAT} found in MaskedVFATs {badVFATs}. Skipping")
-                        continue
-                    elif VFATcompatibleHit(badVFATs_masked,prop_glb_r,prop_loc_x,etaP):
-                        #logging.debug(f"On {chamberID} proVFAT {propVFAT} compatible with MaskedVFATs {badVFATs}. Skipping")
-                        continue
-                if badVFATs_missing is not None:
-                    if propVFAT in badVFATs_missing:
-                        #logging.debug(f"On {chamberID} propVFAT {propVFAT} found in MaskedVFATs {badVFATs}. Skipping")
-                        continue
-                    elif VFATcompatibleHit(badVFATs_missing,prop_glb_r,prop_loc_x,etaP):
-                        #logging.debug(f"On {chamberID} proVFAT {propVFAT} compatible with MaskedVFATs {badVFATs}. Skipping")
-                        continue
-                if badVFATs_error is not None:
-                    if propVFAT in badVFATs_error:
-                        #logging.debug(f"On {chamberID} propVFAT {propVFAT} found in MaskedVFATs {badVFATs}. Skipping")
-                        continue
-                    elif VFATcompatibleHit(badVFATs_error,prop_glb_r,prop_loc_x,etaP):
-                        #logging.debug(f"On {chamberID} proVFAT {propVFAT} compatible with MaskedVFATs {badVFATs}. Skipping")
-                        continue
-                """
-            #print("evt.mu_propagatedLoc_y[PropHit_index] : ",evt.mu_propagatedLoc_y[PropHit_index])
-            #print("evt.mu_propagated_EtaPartition_rMin[PropHit_index]*evt.mu_propagated_EtaPartition_phiMin[PropHit_index] : ",evt.mu_propagated_EtaPartition_rMin[PropHit_index]*np.cos(evt.mu_propagated_EtaPartition_phiMin[PropHit_index]))
-            #print("evt.mu_propagated_EtaPartition_rMax[PropHit_index]*evt.mu_propagated_EtaPartition_phiMax[PropHit_index] : ",evt.mu_propagated_EtaPartition_rMax[PropHit_index]*np.cos(evt.mu_propagated_EtaPartition_phiMax[PropHit_index]))
             PropHit_Dict[PropHitChamberID]['region'].append(region)
             PropHit_Dict[PropHitChamberID]['station'].append(station)
             PropHit_Dict[PropHitChamberID]['chamber'].append(chamber)
