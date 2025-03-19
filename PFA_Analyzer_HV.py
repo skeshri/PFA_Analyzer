@@ -625,9 +625,6 @@ for chain_index,evt in enumerate(chain):
                         #pass
                         continue
             
-                #badVFATs_masked =  maskedVFATs_masked.get(chamberID)            
-                #badVFATs_missing =  maskedVFATs_missing.get(chamberID)            
-                #badVFATs_error =  maskedVFATs_error.get(chamberID)            
                 badVFATs_masked =  unpackVFATStatus_masked_new(evt,station,region,layer,chamber,vfat)            
                 badVFATs_missing =  unpackVFATStatus_missing_new(evt,station,region,layer,chamber,vfat)            
                 badVFATs_error =  unpackVFATStatus_error_new(evt,station,region,layer,chamber,vfat)            

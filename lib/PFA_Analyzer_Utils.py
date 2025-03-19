@@ -737,9 +737,7 @@ vec_chamberName = np.vectorize(getChamberName,otypes=[list])
 
 
 
-def unpackVFATStatus_masked_new(evt,station,region,layer,chamber,vfat):
-    VFATMasked_dict = {}
-    count=0
+def unpackVFATStatus_masked_new(evt,station,region,layer,chamber,vfat): ## ==> New VFAT masking (remove masked VFATs at DAQ)
     for k,layer in enumerate(evt.gemOHStatus_layer):
         station_OH = evt.gemOHStatus_station[k]
         region_OH = evt.gemOHStatus_region[k]
@@ -754,9 +752,7 @@ def unpackVFATStatus_masked_new(evt,station,region,layer,chamber,vfat):
     return False
 
 
-def unpackVFATStatus_missing_new(evt,station,region,layer,chamber,vfat):
-    VFATMasked_dict = {}
-    count=0
+def unpackVFATStatus_missing_new(evt,station,region,layer,chamber,vfat): ## New VFAT masking (Masked missing VFATs)
     for k,layer in enumerate(evt.gemOHStatus_layer):
         station_OH = evt.gemOHStatus_station[k]
         region_OH = evt.gemOHStatus_region[k]
@@ -771,9 +767,7 @@ def unpackVFATStatus_missing_new(evt,station,region,layer,chamber,vfat):
     return False
 
 
-def unpackVFATStatus_error_new(evt,station,region,layer,chamber,vfat):
-    VFATMasked_dict = {}
-    count=0
+def unpackVFATStatus_error_new(evt,station,region,layer,chamber,vfat): ## ==> New VFAT maksing (VFATs in error)
     for k,layer in enumerate(evt.gemOHStatus_layer):
         station_OH = evt.gemOHStatus_station[k]
         region_OH = evt.gemOHStatus_region[k]
@@ -788,9 +782,7 @@ def unpackVFATStatus_error_new(evt,station,region,layer,chamber,vfat):
             return True
     return False
 
-def unpackVFATStatus_DAQenabled(evt,station,region,layer,chamber,vfat):
-    VFATMasked_dict = {}
-    count=0
+def unpackVFATStatus_DAQenabled(evt,station,region,layer,chamber,vfat): ## ==> New VFAT masking (Check GEM OH status stored)
     for k,layer in enumerate(evt.gemOHStatus_layer):
         station_OH = evt.gemOHStatus_station[k]
         region_OH = evt.gemOHStatus_region[k]
@@ -806,130 +798,32 @@ def unpackVFATStatus_DAQenabled(evt,station,region,layer,chamber,vfat):
         return False
 
 
-def unpackVFATStatus_masked(evt,VFATMaskBook):
+
+def unpackVFATStatus(evt,VFATMaskBook): ## ==> Old VFAT masking
     VFATMasked_dict = {}
-    #chambers_withoutGEMOHStatus = GE11_ChamberIDs()
-    count=0
     for k,layer in enumerate(evt.gemOHStatus_layer):
         station = evt.gemOHStatus_station[k]
         region = evt.gemOHStatus_region[k]
         chamber = evt.gemOHStatus_chamber[k]
         endcapTag = EndcapLayer2label(region,layer)
         VFATsMasked = whichBitsAreFalse(evt.gemOHStatus_VFATMasked[k])
-        VFATsMissing = whichBitsAreTrue(evt.gemOHStatus_VFATMissing[k])
-        #print("###################",type(VFATsMasked))
-        #print("###################",type(VFATsMasked.shape))
         error = evt.gemOHStatus_errors[k]
         warning = ord(evt.gemOHStatus_warnings[k])
         chamberID = getChamberName(region,chamber,layer,station)
-        #print("layer",layer)
-        count+=1
-        #print("VFATsMasked",VFATsMasked)
-        #if chamberID in chambers_withoutGEMOHStatus: chambers_withoutGEMOHStatus.remove(chamberID)
 
         # if error or warning, mask the entire chamber
-        #if (error != 0 or warning != 0) : 
-        #    VFATsMasked = list(range(24))
-        ## Not ready for GE21, VFAT range to be checked
-        #if station != 2:
-        #    for v in VFATsMasked: VFATMaskBook[endcapTag].Fill(chamber,v)
-        
-
-        if list(VFATsMasked) != []:
-            VFATMasked_dict[chamberID] = VFATsMasked if VFATMasked_dict.get(chamberID) is None else  np.append(VFATMasked_dict[chamberID],VFATsMasked)
-        #if list(VFATsMissing) != []:
-        #    VFATMasked_dict[chamberID] = VFATsMissing if VFATMasked_dict.get(chamberID) is None else  np.append(VFATMasked_dict[chamberID],VFATsMissing)
-
-    #print("count",count)
-    ## Masking all VFATs from chambers not listed in GEMOHstatus, assuming they were not included in data taking
-    #for chamberID in chambers_withoutGEMOHStatus:
-    #    VFATsMasked = list(range(24))
-    #    VFATMasked_dict[chamberID] = VFATsMasked
-    return VFATMasked_dict,VFATMaskBook
-
-
-
-def unpackVFATStatus_missing(evt,VFATMaskBook):
-    VFATMasked_dict = {}
-    #chambers_withoutGEMOHStatus = GE11_ChamberIDs()
-    count=0
-    for k,layer in enumerate(evt.gemOHStatus_layer):
-        station = evt.gemOHStatus_station[k]
-        region = evt.gemOHStatus_region[k]
-        chamber = evt.gemOHStatus_chamber[k]
-        endcapTag = EndcapLayer2label(region,layer)
-        VFATsMasked = whichBitsAreFalse(evt.gemOHStatus_VFATMasked[k])
-        VFATsMissing = whichBitsAreTrue(evt.gemOHStatus_VFATMissing[k])
-        #print("###################",type(VFATsMasked))
-        #print("###################",type(VFATsMasked.shape))
-        error = evt.gemOHStatus_errors[k]
-        warning = ord(evt.gemOHStatus_warnings[k])
-        chamberID = getChamberName(region,chamber,layer,station)
-        #print("layer",layer)
-        count+=1
-        #print("VFATsMasked",VFATsMasked)
-        #if chamberID in chambers_withoutGEMOHStatus: chambers_withoutGEMOHStatus.remove(chamberID)
-
-        # if error or warning, mask the entire chamber
-        #if (error != 0 or warning != 0) :
-        #    VFATsMasked = list(range(24))
-        ## Not ready for GE21, VFAT range to be checked
-        if station != 2:
-            for v in VFATsMasked: VFATMaskBook[endcapTag].Fill(chamber,v)
-
-
-        #if list(VFATsMasked) != []:                                              
-        #    VFATMasked_dict[chamberID] = VFATsMasked if VFATMasked_dict.get(chamberID) is None else  np.append(VFATMasked_dict[chamberID],VFATsMasked)                                                                                             
-        if list(VFATsMissing) != []:                                                                                                             VFATMasked_dict[chamberID] = VFATsMissing if VFATMasked_dict.get(chamberID) is None else  np.append(VFATMasked_dict[chamberID],VFATsMissing)
-
-    #print("count",count)
-    ## Masking all VFATs from chambers not listed in GEMOHstatus, assuming they were not included in data taking
-    #for chamberID in chambers_withoutGEMOHStatus:
-    #    VFATsMasked = list(range(24))
-    #    VFATMasked_dict[chamberID] = VFATsMasked
-    return VFATMasked_dict,VFATMaskBook
-
-
-def unpackVFATStatus_error(evt,VFATMaskBook):
-    VFATMasked_dict = {}
-    #chambers_withoutGEMOHStatus = GE11_ChamberIDs()
-    count=0
-    for k,layer in enumerate(evt.gemOHStatus_layer):
-        station = evt.gemOHStatus_station[k]
-        region = evt.gemOHStatus_region[k]
-        chamber = evt.gemOHStatus_chamber[k]
-        endcapTag = EndcapLayer2label(region,layer)
-        VFATsMasked = whichBitsAreFalse(evt.gemOHStatus_VFATMasked[k])
-        VFATsMissing = whichBitsAreTrue(evt.gemOHStatus_VFATMissing[k])
-        #print("###################",type(VFATsMasked))
-        #print("###################",type(VFATsMasked.shape))
-        error = evt.gemOHStatus_errors[k]
-        warning = ord(evt.gemOHStatus_warnings[k])
-        chamberID = getChamberName(region,chamber,layer,station)
-        #print("layer",layer)
-        count+=1
-        #print("VFATsMasked",VFATsMasked)
-        #if chamberID in chambers_withoutGEMOHStatus: chambers_withoutGEMOHStatus.remove(chamberID)
-
-        # if error or warning, mask the entire chamber
-        if (error != 0 or warning != 0) :
+        if (error != 0 or warning != 0) : 
             VFATsMasked = list(range(24))
         ## Not ready for GE21, VFAT range to be checked
         if station != 2:
             for v in VFATsMasked: VFATMaskBook[endcapTag].Fill(chamber,v)
+        
 
-
-        #if list(VFATsMasked) != []:
-        #    VFATMasked_dict[chamberID] = VFATsMasked if VFATMasked_dict.get(chamberID) is None else  np.append(VFATMasked_dict[chamberID],VFATsMasked)
-        #if list(VFATsMissing) != []:    
-        #    VFATMasked_dict[chamberID] = VFATsMissing if VFATMasked_dict.get(chamberID) is None else  np.append(VFATMasked_dict[chamberID],VFATsMissing)
-
-    #print("count",count)
-    ## Masking all VFATs from chambers not listed in GEMOHstatus, assuming they were not included in data taking
-    #for chamberID in chambers_withoutGEMOHStatus:
-    #    VFATsMasked = list(range(24))
-    #    VFATMasked_dict[chamberID] = VFATsMasked
+        if VFATsMasked != []:
+            VFATMasked_dict[chamberID] = VFATsMasked if VFATMasked_dict.get(chamberID) is None else  np.append(VFATMasked_dict[chamberID],VFATsMasked)
+    
     return VFATMasked_dict,VFATMaskBook
+
 
 def generateVFATDict(matching_variables):
     output_dict = {}
